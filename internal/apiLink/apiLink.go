@@ -1,7 +1,6 @@
 package apiLink
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 const baseUrl string = "https://pokeapi.co/api/v2/location-area/"
 
 func FetchMap(idx int) ([]byte, error) {
-	fmt.Println("hmm... quite fetching...")
 	res, err := doFetch(baseUrl + strconv.Itoa(idx))
 	if err != nil {
 		return nil, err

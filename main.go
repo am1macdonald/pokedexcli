@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 
@@ -18,10 +17,10 @@ type config struct {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(config) error
+	callback    func(*config) error
 }
 
-func commandHelp(c config) error {
+func commandHelp(c *config) error {
 	fmt.Printf("%v", `
 Welcome to the Pokedex!
 Usage:
@@ -33,28 +32,43 @@ exit: Exit the Pokedex
 	return nil
 }
 
-func commandMap(c config) error {
-	fmt.Println("Getting next map area")
-	bytes, err := apiLink.FetchMap(c.next)
-	if err != nil {
-		fmt.Println("Something whent whrong?!")
-	}
-	locationArea, err := locationArea.MarshalLocationArea(bytes)
-	if err != nil {
-		fmt.Println("Something whent whrong?!")
-	}
-	fmt.Printf("%v\n", locationArea.Name)
-	return nil
-}
-
-func commandMapB(c config) error {
-	if c.previous == 1 {
-		return errors.New("Already on first page!")
+func mapThroughArea(start int) error {
+	for i := start; i < (start + 20); i++ {
+		bytes, err := apiLink.FetchMap(i)
+		if err != nil {
+			return err
+		}
+		locationArea, err := locationArea.MarshalLocationArea(bytes)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%d : %v\n", i, locationArea.Name)
 	}
 	return nil
 }
 
-func commandExit(c config) error {
+func commandMap(c *config) error {
+	if mapThroughArea(c.next) != nil {
+		fmt.Println("Something went wrong")
+	}
+	c.previous = c.next
+	c.next += 20
+	return nil
+}
+
+func commandMapB(c *config) error {
+	if c.previous < 1 {
+		c.previous = 1
+	}
+	if mapThroughArea(c.previous) != nil {
+		fmt.Println("Something went wrong")
+	}
+	c.next = c.previous
+	c.previous -= 20
+	return nil
+}
+
+func commandExit(c *config) error {
 	os.Exit(0)
 	return nil
 }
@@ -93,7 +107,7 @@ func main() {
 		for sc.Scan() {
 			text := sc.Text()
 			if _, ok := commands[text]; ok {
-				commands[text].callback(conf)
+				commands[text].callback(&conf)
 				break
 			}
 			fmt.Println("unknown command")

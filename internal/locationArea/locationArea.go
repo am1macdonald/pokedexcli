@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 )
 
+type Marshaller[T any] interface {
+	Marshal([]byte) T
+}
+
 type LocationArea struct {
 	EncounterMethodRates []struct {
 		EncounterMethod struct {
@@ -57,11 +61,71 @@ type LocationArea struct {
 	} `json:"pokemon_encounters"`
 }
 
-func MarshalLocationArea(bytes []byte) (*LocationArea, error) {
-	locationArea := LocationArea{}
-	err := json.Unmarshal(bytes, &locationArea)
+func (l *LocationArea) Marshal(bytes []byte) error {
+	err := json.Unmarshal(bytes, l)
 	if err != nil {
-		return &locationArea, err
+		return err
 	}
-	return &locationArea, nil
+	return nil
+}
+
+type LocationAreaDetails struct {
+	EncounterMethodRates []struct {
+		EncounterMethod struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"encounter_method"`
+		VersionDetails []struct {
+			Rate    int `json:"rate"`
+			Version struct {
+				Name string `json:"name"`
+				URL  string `json:"url"`
+			} `json:"version"`
+		} `json:"version_details"`
+	} `json:"encounter_method_rates"`
+	GameIndex int `json:"game_index"`
+	ID        int `json:"id"`
+	Location  struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"location"`
+	Name  string `json:"name"`
+	Names []struct {
+		Language struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"language"`
+		Name string `json:"name"`
+	} `json:"names"`
+	PokemonEncounters []struct {
+		Pokemon struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"pokemon"`
+		VersionDetails []struct {
+			EncounterDetails []struct {
+				Chance          int   `json:"chance"`
+				ConditionValues []any `json:"condition_values"`
+				MaxLevel        int   `json:"max_level"`
+				Method          struct {
+					Name string `json:"name"`
+					URL  string `json:"url"`
+				} `json:"method"`
+				MinLevel int `json:"min_level"`
+			} `json:"encounter_details"`
+			MaxChance int `json:"max_chance"`
+			Version   struct {
+				Name string `json:"name"`
+				URL  string `json:"url"`
+			} `json:"version"`
+		} `json:"version_details"`
+	} `json:"pokemon_encounters"`
+}
+
+func (l *LocationAreaDetails) Marshal(bytes []byte) error {
+	err := json.Unmarshal(bytes, l)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -4,9 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/am1macdonald/pokedexcli/internal/apiLink"
 	"github.com/am1macdonald/pokedexcli/internal/locationArea"
+	"github.com/am1macdonald/pokedexcli/internal/pokecache"
 )
 
 type config struct {
@@ -19,6 +22,8 @@ type cliCommand struct {
 	description string
 	callback    func(*config) error
 }
+
+var cache pokecache.Cache
 
 func commandHelp(c *config) error {
 	fmt.Printf("%v", `
@@ -34,9 +39,15 @@ exit: Exit the Pokedex
 
 func mapThroughArea(start int) error {
 	for i := start; i < (start + 20); i++ {
-		bytes, err := apiLink.FetchMap(i)
-		if err != nil {
-			return err
+		var bytes []byte
+		bytes, ok := cache.Get(strconv.Itoa(i))
+		if !ok {
+			b, err := apiLink.FetchMap(i)
+			if err != nil {
+				return err
+			}
+			bytes = b
+			cache.Add(strconv.Itoa(i), b)
 		}
 		locationArea, err := locationArea.MarshalLocationArea(bytes)
 		if err != nil {
@@ -94,6 +105,10 @@ var commands = map[string]cliCommand{
 		description: "Display previous set of map locations",
 		callback:    commandMapB,
 	},
+}
+
+func init() {
+	cache = *pokecache.NewCache(time.Second * 30)
 }
 
 func main() {

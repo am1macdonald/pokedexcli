@@ -92,14 +92,19 @@ func commandExplore(c *config, params []string) error {
 	if len(params) <= 0 {
 		fmt.Println("Area name is required!")
 	}
+	fmt.Printf("Exploring %v...\n", params[0])
 	lad := locationArea.LocationAreaDetails{}
 	bytes, err := getArea(params[0])
 	if err != nil {
 		fmt.Println("Something went wrong")
 	}
-	lad.Marshal(bytes)
+	err = lad.Marshal(bytes)
+	if err != nil {
+		fmt.Println("Can't marshal data!")
+	}
+	fmt.Println("Found pokemon:")
 	for _, val := range lad.PokemonEncounters {
-		fmt.Println(val.Pokemon.Name)
+		fmt.Printf("  - %v\n", val.Pokemon.Name)
 	}
 	return nil
 }

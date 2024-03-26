@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/am1macdonald/pokedexcli/internal/apiLink"
-	"github.com/am1macdonald/pokedexcli/internal/locationArea"
 	"github.com/am1macdonald/pokedexcli/internal/pokecache"
+	"github.com/am1macdonald/pokedexcli/internal/projectTypes"
 )
 
 type config struct {
@@ -57,7 +57,7 @@ func mapThroughArea(start int) error {
 		if err != nil {
 			return err
 		}
-		la := locationArea.LocationArea{}
+		la := projectTypes.LocationArea{}
 		err = la.Marshal(bytes)
 		if err != nil {
 			return err
@@ -93,7 +93,7 @@ func commandExplore(c *config, params []string) error {
 		fmt.Println("Area name is required!")
 	}
 	fmt.Printf("Exploring %v...\n", params[0])
-	lad := locationArea.LocationAreaDetails{}
+	lad := projectTypes.LocationAreaDetails{}
 	bytes, err := getArea(params[0])
 	if err != nil {
 		fmt.Println("Something went wrong")

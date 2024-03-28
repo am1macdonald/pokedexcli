@@ -1,17 +1,3 @@
 module github.com/am1macdonald/pokedexcli
 
 go 1.22.1
-
-replace github.com/am1macdonald/apiLink v0.0.0 => ./internal/apiLink
-replace github.com/am1macdonald/locationArea v0.0.0 => ./internal/types/locationArea
-replace github.com/am1macdonald/locationAreaDetails v0.0.0 => ./internal/types/locationAreaDetails
-replace github.com/am1macdonald/pokemon v0.0.0 => ./internal/types/pokemon
-replace github.com/am1macdonald/pokecache v0.0.0 => ./internal/pokecache
-
-require (
-	github.com/am1macdonald/apiLink v0.0.0
-	github.com/am1macdonald/locationArea v0.0.0
-	github.com/am1macdonald/locationAreaDetails v0.0.0
-	github.com/am1macdonald/pokemon v0.0.0
-	github.com/am1macdonald/pokecache v0.0.0
-)

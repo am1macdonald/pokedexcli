@@ -28,15 +28,17 @@ type cliCommand struct {
 
 var cache pokecache.Cache
 
+var commands map[string]cliCommand
+
 func commandHelp(c *config, _ []string) error {
 	fmt.Printf("%v", `
 Welcome to the Pokedex!
 Usage:
 
-help: Displays a help message
-exit: Exit the Pokedex
-
 `)
+	for _, val := range commands {
+		fmt.Printf("%v: %v\n", val.name, val.description)
+	}
 	return nil
 }
 
@@ -111,41 +113,53 @@ func commandExplore(c *config, params []string) error {
 	return nil
 }
 
+func commandCatch(c *config, params []string) error {
+	if len(params) <= 0 {
+		fmt.Println("Pokemon name is required")
+	}
+	fmt.Printf("Throwing a pokeball at %v...", params[0])
+	return nil
+}
+
 func commandExit(c *config, _ []string) error {
 	os.Exit(0)
 	return nil
 }
 
-var commands = map[string]cliCommand{
-	"help": {
-		name:        "help",
-		description: "Displays a help message",
-		callback:    commandHelp,
-	},
-	"exit": {
-		name:        "exit",
-		description: "Exit the Pokedex",
-		callback:    commandExit,
-	},
-	"map": {
-		name:        "map",
-		description: "Display map locations",
-		callback:    commandMap,
-	},
-	"mapb": {
-		name:        "mapb",
-		description: "Display previous set of map locations",
-		callback:    commandMapB,
-	},
-	"explore": {
-		name:        "explore",
-		description: "list the pokemon in an area",
-		callback:    commandExplore,
-	},
-}
-
 func init() {
 	cache = *pokecache.NewCache(time.Minute * 5)
+	commands = map[string]cliCommand{
+		"help": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
+		},
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
+		},
+		"map": {
+			name:        "map",
+			description: "Display map locations",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Display previous set of map locations",
+			callback:    commandMapB,
+		},
+		"explore": {
+			name:        "explore",
+			description: "List the pokemon in an area",
+			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Catch a pokemon!",
+			callback:    commandCatch,
+		},
+	}
 }
 
 func main() {

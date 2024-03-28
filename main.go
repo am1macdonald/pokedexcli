@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -10,7 +11,8 @@ import (
 
 	"github.com/am1macdonald/pokedexcli/internal/apiLink"
 	"github.com/am1macdonald/pokedexcli/internal/pokecache"
-	"github.com/am1macdonald/pokedexcli/internal/projectTypes"
+	"github.com/am1macdonald/pokedexcli/internal/types/locationArea"
+	"github.com/am1macdonald/pokedexcli/internal/types/locationAreaDetails"
 )
 
 type config struct {
@@ -57,8 +59,8 @@ func mapThroughArea(start int) error {
 		if err != nil {
 			return err
 		}
-		la := projectTypes.LocationArea{}
-		err = la.Marshal(bytes)
+		la := locationArea.LocationArea{}
+		err = json.Unmarshal(bytes, &la)
 		if err != nil {
 			return err
 		}
@@ -93,12 +95,12 @@ func commandExplore(c *config, params []string) error {
 		fmt.Println("Area name is required!")
 	}
 	fmt.Printf("Exploring %v...\n", params[0])
-	lad := projectTypes.LocationAreaDetails{}
+	lad := locationAreaDetails.LocationAreaDetails{}
 	bytes, err := getArea(params[0])
 	if err != nil {
 		fmt.Println("Something went wrong")
 	}
-	err = lad.Marshal(bytes)
+	err = json.Unmarshal(bytes, &lad)
 	if err != nil {
 		fmt.Println("Can't marshal data!")
 	}

@@ -13,6 +13,7 @@ import (
 	"github.com/am1macdonald/pokedexcli/internal/pokecache"
 	"github.com/am1macdonald/pokedexcli/internal/types/locationArea"
 	"github.com/am1macdonald/pokedexcli/internal/types/locationAreaDetails"
+	"github.com/am1macdonald/pokedexcli/internal/types/pokemon"
 )
 
 type config struct {
@@ -30,6 +31,8 @@ var cache pokecache.Cache
 
 var commands map[string]cliCommand
 
+var pokedex map[string]pokemon.Pokemon
+
 func commandHelp(c *config, _ []string) error {
 	fmt.Printf("%v", `
 Welcome to the Pokedex!
@@ -39,6 +42,7 @@ Usage:
 	for _, val := range commands {
 		fmt.Printf("%v: %v\n", val.name, val.description)
 	}
+	fmt.Println("")
 	return nil
 }
 
@@ -117,7 +121,22 @@ func commandCatch(c *config, params []string) error {
 	if len(params) <= 0 {
 		fmt.Println("Pokemon name is required")
 	}
-	fmt.Printf("Throwing a pokeball at %v...", params[0])
+	bytes, err := apiLink.FetchPokemon(params[0])
+	if err != nil {
+		fmt.Println("There are no pokemon with that name around")
+	}
+	p := pokemon.Pokemon{}
+	err = json.Unmarshal(bytes, &p)
+	if err != nil {
+		fmt.Println("Pokemon is broken!")
+	}
+	fmt.Printf("Throwing a pokeball at %v...\n", params[0])
+	if !p.Catch() {
+		fmt.Printf("%v escaped...\n", params[0])
+	} else {
+		fmt.Printf("%v was caught!\n", params[0])
+		pokedex[p.Name] = p
+	}
 	return nil
 }
 
@@ -128,6 +147,7 @@ func commandExit(c *config, _ []string) error {
 
 func init() {
 	cache = *pokecache.NewCache(time.Minute * 5)
+	pokedex = map[string]pokemon.Pokemon{}
 	commands = map[string]cliCommand{
 		"help": {
 			name:        "help",

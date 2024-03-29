@@ -5,10 +5,21 @@ import (
 	"net/http"
 )
 
-const baseUrl string = "https://pokeapi.co/api/v2/location-area/"
+const (
+	baseMapUrl     string = "https://pokeapi.co/api/v2/location-area/"
+	basePokemonUrl string = "https://pokeapi.co/api/v2/pokemon/"
+)
 
 func FetchMap(idx string) ([]byte, error) {
-	res, err := doFetch(baseUrl + idx)
+	res, err := doFetch(baseMapUrl + idx)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func FetchPokemon(name string) ([]byte, error) {
+	res, err := doFetch(basePokemonUrl + name)
 	if err != nil {
 		return nil, err
 	}

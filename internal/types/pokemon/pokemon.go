@@ -1,5 +1,7 @@
 package pokemon
 
+import "math/rand"
+
 type Pokemon struct {
 	Abilities []struct {
 		Ability struct {
@@ -269,4 +271,9 @@ type Pokemon struct {
 		} `json:"type"`
 	} `json:"types"`
 	Weight int `json:"weight"`
+}
+
+func (p *Pokemon) Catch() bool {
+	// Final Hit Chance = Base Hit Chance - (Experience Modifier * Enemy Experience) + Random Factor
+	return 100-p.BaseExperience+rand.Intn(p.BaseExperience) < 30
 }
